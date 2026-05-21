@@ -210,7 +210,8 @@ int pci_ats_page_aligned(struct pci_dev *pdev)
  * CXL.cache, devices need to get the Host Physical Address (HPA) from the Host
  * by means of an ATS request on CXL.io.
  *
- * In other world, CXL.cache devices cannot access physical memory without ATS.
+ * In other words, CXL.cache devices cannot access host physical memory without
+ * ATS.
  */
 static bool pci_cxl_ats_always_on(struct pci_dev *pdev)
 {
@@ -222,19 +223,17 @@ static bool pci_cxl_ats_always_on(struct pci_dev *pdev)
 	if (!offset)
 		return false;
 
-	pci_read_config_word(pdev, offset + PCI_DVSEC_CXL_CAP, &cap);
-	if (cap & PCI_DVSEC_CXL_CACHE_CAPABLE)
-		return true;
+	if (pci_read_config_word(pdev, offset + PCI_DVSEC_CXL_CAP, &cap))
+		return false;
 
-	return false;
+	return cap & PCI_DVSEC_CXL_CACHE_CAPABLE;
 }
 
 /**
  * pci_ats_always_on - Whether the PCI device requires ATS to be always enabled
  * @pdev: the PCI device
  *
- * Returns true, if the PCI device requires non-PASID ATS function on an IOMMU
- * bypassed configuration.
+ * Returns true, if the PCI device requires ATS for basic functional operation.
  */
 bool pci_ats_always_on(struct pci_dev *pdev)
 {
