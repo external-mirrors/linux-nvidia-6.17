@@ -195,6 +195,7 @@ static int bind_map_addr(struct sock *sk, struct sockaddr *addr, int addrlen,
 		/* see __inet_bind(), we only want to allow
 		 * AF_UNSPEC if the address is INADDR_ANY
 		 */
+		addr4 = (struct sockaddr_in *)addr;
 		if (addr4->sin_addr.s_addr != htonl(INADDR_ANY))
 			return -EAFNOSUPPORT;
 		family = AF_INET;
@@ -808,7 +809,7 @@ int aa_inet_file_perm(const struct cred *subj_cred, struct aa_label *label,
 					&ad));
 
 	if (!error) {
-		struct stored_match_addr laddr, raddr;
+		struct stored_match_addr raddr;
 
 		/* TODO: have ad here: instead of in CB so we do have to redo */
 		error = map_sock_addr(sock, ADDR_REMOTE, &raddr, NULL);
